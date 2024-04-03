@@ -7,6 +7,10 @@
 # include <netinet/in.h>
 # include <fcntl.h>
 # include <unistd.h>
+# include <sstream>
+# include <vector>
+
+# define SERVERPORT 8090
 
 typedef struct s_server {
 	int port;
