@@ -106,47 +106,35 @@ int	main(int ac, char **av)
 	}
 
 	/*** CONNECTIONS ***/
-	int					max_fd = server.fd;
-	fd_set				read_fds;
-	std::vector<int>	clients;
+	std::vector<pollfd>	fds;
+	int					poll_ret;
+	int					client_fd;
 
-	FD_ZERO(&read_fds);
-	FD_SET(server.fd, &read_fds);
-
+	fds.push_back({server.fd, POLLIN, 0});
 	while (true)
 	{
-		if (select(max_fd + 1, &read_fds, NULL, NULL, NULL) == -1)
+		poll_ret = poll(fds.data(), fds.size(), -1);
+		if (poll_ret == -1)
 		{
-			std::cerr << "Error in select()" << std::endl;
+			std::cerr << "Error in poll(): " << strerror(errno) << std::endl;
 			continue;
 		}
-
-		// Check for new connection requests
-		if (FD_ISSET(server.fd, &read_fds))
+		if (fds[0].revents & POLLIN)
 		{
-			int client_fd = accept(server.fd, NULL, NULL);
+			client_fd = accept(server.fd, NULL, NULL);
 			if (client_fd != -1)
-			{
-				if (client_fd > max_fd)
-					max_fd = client_fd;
-				FD_SET(client_fd, &read_fds);
-				clients.push_back(client_fd);
-			}
+				fds.push_back({client_fd, POLLIN, 0});
 		}
 
-		// Check for data from existing connections
-		for (std::vector<int>::iterator it = clients.begin(); it != clients.end();)
+		for (size_t i = 1; i < fds.size(); ++i)
 		{
-			int client_fd = *it;
-			if (FD_ISSET(client_fd, &read_fds))
+			if (fds[i].revents & POLLIN)
 			{
-				handleConnection(client_fd);
-				FD_CLR(client_fd, &read_fds);
-				close(client_fd);
-				it = clients.erase(it);
+				handleConnection(fds[i].fd);
+				close(fds[i].fd);
+				fds.erase(fds.begin() + i);
+				--i;
 			}
-			else
-				++it;
 		}
 	}
 
