@@ -18,12 +18,12 @@ void servePage(int client_fd) {
 
 void printHTTPRequest(int client_fd)
 {
-	const int BUFFER_SIZE = 1024;
-	char buffer[BUFFER_SIZE];
+	const int	BUFFER_SIZE = 1024;
+	char		buffer[BUFFER_SIZE];
 
-	std::string request;
-	ssize_t 	bytes_read;
-	
+	std::string	request;
+	ssize_t		bytes_read;
+
 	while (1)
 	{
 		bytes_read = recv(client_fd, buffer, BUFFER_SIZE, 0);
@@ -34,19 +34,16 @@ void printHTTPRequest(int client_fd)
 			if (errno == 35)
 				continue;
 			else
-				break;
+			{
+				std::cerr << "Error in recv(): " << strerror(errno) << std::endl;
+				return;
+			}
 		}
 		request.append(buffer, bytes_read);
-		if (request.substr(request.length() - 4) == "\r\n\r\n")
+		if (request.length() >= 4 && request.substr(request.length() - 4) == "\r\n\r\n")
 			break;
 	}
-	if (bytes_read == -1)
-	{
-		std::cerr << "Error reading data from client" << std::endl;
-		std::cerr << "errno == " << errno << " | errno message: " << strerror(errno) << std::endl;
-		return;
-	}
-	std::cout << "Received HTTP Request:" << std::endl;
+	std::cout << GREEN "Received HTTP Request:" CLEAR << std::endl;
 	std::cout << request << std::endl;
 }
 
