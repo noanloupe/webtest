@@ -28,4 +28,13 @@ typedef struct s_server {
 	sockaddr_in sockaddr;
 } t_server;
 
+s_server	setupServer(void);
+
+void		runServer(int server_fd);
+
+std::string	getPageContent(std::string path);
+void servePage(int client_fd);
+std::string	getRequestHeader(int client_fd);
+void handleConnection(int client_fd);
+
 #endif
