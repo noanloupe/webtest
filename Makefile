@@ -24,11 +24,11 @@ GCC = c++ -std=c++11 -Wall -Wextra -Werror -g
 OBJS_DIR = ./objects/
 OBJS = $(addprefix $(OBJS_DIR), $(SRCS:.cpp=.o))
 
-SHELL = bash
-RED = \033[1;31m
-GREEN = \033[1;32m
-BLUE = \033[1;34m
-RESET = \033[0m
+SHELL	= bash
+RED 	= \033[1;31m
+GREEN	= \033[1;32m
+BLUE	= \033[1;34m
+RESET	= \033[0m
 
 all: ${NAME}
 

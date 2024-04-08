@@ -8,6 +8,7 @@
 # include <fcntl.h>
 # include <unistd.h>
 # include <sstream>
+# include <map>
 # include <vector>
 # include <poll.h>
 
@@ -22,19 +23,30 @@
 
 # define SERVERPORT 8090
 
-typedef struct s_server {
+typedef struct s_server
+{
 	int port;
 	int fd;
 	sockaddr_in sockaddr;
-} t_server;
+}	t_server;
 
+typedef struct s_request 
+{
+	int									fd;
+	std::string							method;
+	std::string							path;
+	std::map<std::string, std::string>	header;
+	std::string							body;
+}	t_request;
+
+/*	SERVER	*/
 s_server	setupServer(void);
-
 void		runServer(int server_fd);
 
-std::string	getPageContent(std::string path);
-void servePage(int client_fd);
+/*	REQUEST	*/
+void		handleConnection(int client_fd);
 std::string	getRequestHeader(int client_fd);
-void handleConnection(int client_fd);
+std::string	getPageContent(std::string path);
+void		servePage(int client_fd);
 
 #endif
