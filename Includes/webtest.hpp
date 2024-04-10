@@ -40,13 +40,27 @@ typedef struct s_request
 }	t_request;
 
 /*	SERVER	*/
+void		runServer(s_server& server);
 s_server	setupServer(void);
-void		runServer(int server_fd);
 
 /*	REQUEST	*/
-void		handleConnection(int client_fd);
-std::string	getRequestHeader(int client_fd);
 std::string	getPageContent(std::string path);
-void		servePage(int client_fd);
+std::string	getRequestHeader(int client_fd);
+void		handleConnection(int client_fd);
+bool		parseRequest(s_request& request);
+void		printRequest(s_request& request);
+std::string	replaceHexAndAmp(std::string src);
+void		servePage(int client_fd, int code, std::string value, std::string path);
+
+/* EXCEPTIONS */
+
+class tempError : public std::exception
+{
+	public:
+		const char*	what(void) const throw()
+		{
+			return("This is a temp throw (an error occured thought)");
+		}
+};
 
 #endif

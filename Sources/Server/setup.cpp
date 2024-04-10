@@ -9,13 +9,13 @@ s_server	setupServer(void)
 	if (server.fd == -1)
 	{
 		std::cerr << "Error: socket" << std::endl;
-		exit(1); /* /!\ */
+		throw(tempError());
 	}
 	if (fcntl(server.fd, F_SETFL, O_NONBLOCK) == -1)
 	{
 		close(server.fd);
 		std::cerr << "Error: fcntl" << std::endl;
-		exit(1); /* /!\ */
+		throw(tempError());
 	}
 
 	int	on = true; // Has to be an int but works the same way has a bool would.
@@ -23,24 +23,12 @@ s_server	setupServer(void)
 	{
 		close(server.fd);
 		std::cerr << "Error: setsockopt" << std::endl;
-		exit(1); /* /!\ */
+		throw(tempError());
 	}
 
 	server.sockaddr.sin_family = AF_INET;
 	server.sockaddr.sin_addr.s_addr = INADDR_ANY;
 	server.sockaddr.sin_port = htons(server.port);
 
-	if (bind(server.fd, (const struct sockaddr*)&server.sockaddr, sizeof(server.sockaddr)) == -1)
-	{
-		close(server.fd);
-		std::cerr << "Error: bind" << std::endl;
-		exit(1); /* /!\ */
-	}
-	if (listen(server.fd, SOMAXCONN) == -1)
-	{
-		close(server.fd);
-		std::cerr << "Error: listen" << std::endl;
-		exit(1); /* /!\ */
-	}
 	return (server);
 }
