@@ -11,6 +11,7 @@
 # include <map>
 # include <vector>
 # include <poll.h>
+# include <cstdio>
 
 # define RED		"\x1b[1m\x1b[38;2;255;0;0m"
 # define LIME		"\x1b[1m\x1b[38;2;0;255;0m"
@@ -47,6 +48,8 @@ s_server	setupServer(void);
 std::string	getPageContent(std::string path);
 std::string	getRequestHeader(int client_fd);
 void		handleConnection(int client_fd);
+void		handleDeleteRequest(s_request& request);
+void		handleGetRequest(s_request& request);
 bool		parseRequest(s_request& request);
 void		printRequest(s_request& request);
 std::string	replaceHexAndAmp(std::string src);

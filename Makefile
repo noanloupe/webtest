@@ -17,6 +17,8 @@ SRCS =	Sources/main.cpp\
 		Sources/Request/parser.cpp\
 		Sources/Request/utils.cpp\
 		Sources/Request/servePage.cpp\
+		Sources/Request/delete.cpp\
+		Sources/Request/get.cpp\
 
 INCL =	Includes/webtest.hpp
 

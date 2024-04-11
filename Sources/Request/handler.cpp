@@ -6,11 +6,11 @@ void	handleConnection(int client_fd)
 
 	request.fd = client_fd;
 	
-	if (parseRequest(request))
+	if (parseRequest(request) == 1)
 	{
 		if (request.method == "POST" && request.header.find("Content-Length") == request.header.end())	// We check that POST method has a content length and not just an empty body
 		{
-			servePage(client_fd, 411, "Length Required", "Sources/Pages/ErrorPages/411.html");
+			servePage(request.fd, 411, "Length Required", "Sources/Pages/ErrorPages/411.html");
 			return ;
 		}
 		else	// We check that any other method has no body (if i'm right, might cause issue if it has none and an other request comes on the same non-blocking socket but very unlikely)
@@ -19,7 +19,7 @@ void	handleConnection(int client_fd)
 			int		ret = recv(request.fd, buffer, 1, 0);
 			if (ret != -1)
 			{
-				servePage(client_fd, 400, "Bad Request", "Sources/Pages/ErrorPages/400.html");
+				servePage(request.fd, 400, "Bad Request", "Sources/Pages/ErrorPages/400.html");
 				return ;
 			}
 		}
@@ -30,18 +30,19 @@ void	handleConnection(int client_fd)
 
 	if (request.method == "GET")
 	{
-		servePage(client_fd, 200, "OK", "sources/Pages/index.html");
+		handleGetRequest(request);
 	}
 	else if (request.method == "POST")
 	{
-		servePage(client_fd, 200, "OK", "sources/Pages/index.html");
+		servePage(request.fd, 200, "OK", "Sources/Pages/index.html");
+		send(request.fd, request.body.c_str(), request.body.size(), 0); // Meh does not work :(
 	}
 	else if (request.method == "DELETE")
 	{
-		servePage(client_fd, 200, "OK", "sources/Pages/index.html");
+		handleDeleteRequest(request);
 	}
 	else
 	{
-		servePage(client_fd, 405, "Method Not Allowed", "Sources/Pages/ErrorPages/405.html");
+		servePage(request.fd, 405, "Method Not Allowed", "Sources/Pages/ErrorPages/405.html");
 	}
 }
