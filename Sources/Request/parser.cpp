@@ -56,6 +56,8 @@ bool	parseRequest(s_request& request)
 	std::getline(ss, line);
 	std::istringstream	firstLineStream(line);
 	firstLineStream >> request.method >> request.path;
+	if (request.path.back() == '?')	// Remove '?' in case there is no query parameters
+		request.path.erase(request.path.size() -1);
 	
 	std::string headerKey;
 	std::string headerValue;
@@ -65,7 +67,7 @@ bool	parseRequest(s_request& request)
 		std::istringstream headerStream(line);
 		std::getline(headerStream, headerKey, ':');
 		std::getline(headerStream, headerValue);
-		request.header[headerKey] = headerValue;
+		request.header[headerKey] = headerValue.substr(1, headerValue.size() - 2);
 	}
 
 	request.body = "";

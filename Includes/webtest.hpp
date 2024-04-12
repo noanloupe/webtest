@@ -50,6 +50,7 @@ std::string	getRequestHeader(int client_fd);
 void		handleConnection(int client_fd);
 void		handleDeleteRequest(s_request& request);
 void		handleGetRequest(s_request& request);
+void		handlePostRequest(s_request& request);
 bool		parseRequest(s_request& request);
 void		printRequest(s_request& request);
 std::string	replaceHexAndAmp(std::string src);

@@ -46,7 +46,7 @@ void	printRequest(s_request& request)
 		std::cout << YELLOW << it->first << ": " CLEAR << it->second << std::endl;
 	}
 	std::cout << std::endl;
-	if (request.body != "")
+	if (request.method == "POST" && request.header["Content-Type"] == "application/x-www-form-urlencoded")
 	{
 		std::cout << YELLOW "body: " CLEAR << std::endl << request.body << std::endl;
 		std::cout << std::endl;

@@ -34,8 +34,7 @@ void	handleConnection(int client_fd)
 	}
 	else if (request.method == "POST")
 	{
-		servePage(request.fd, 200, "OK", "Sources/Pages/index.html");
-		send(request.fd, request.body.c_str(), request.body.size(), 0); // Meh does not work :(
+		handlePostRequest(request);
 	}
 	else if (request.method == "DELETE")
 	{
