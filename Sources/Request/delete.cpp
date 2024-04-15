@@ -2,6 +2,11 @@
 
 void	handleDeleteRequest(s_request& request)
 {
+	if (request.path == "/") // Avoids deleting Uploads directory in case it is empty
+	{
+		return ;
+	}
+
 	request.path = "Sources/Uploads" + request.path;
 	if (access(request.path.c_str(), F_OK) == -1)
 	{
