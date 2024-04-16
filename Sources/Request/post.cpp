@@ -28,18 +28,37 @@ void	downloadFiles(s_request& request, std::string boundary)
 
 
 	std::getline(ss, line);
-	if (line == boundary + "--")
+	if (line == boundary && line == boundary + "--")
 		return ;
-	
+
+
+	std::cout << GREEN "Started downloading files..." CLEAR << std::endl;
 	while (std::getline(ss, line))
 	{
 		// Check if the line is the boundary indicating the end of the request
 		if (line == boundary + "--")
+		{
+			std::cout << CYAN "Found ending boundary" CLEAR << std::endl;
 			break;
+		}
 
-		std::string			fileName = line.substr(line.find("filename=") + 9, line.size() - 2); // Extract file name
-		std::ofstream		outfile;
+		// Extract file name and creating file stream
+		std::ofstream	outfile;
+		std::string		fileName = line.substr(line.find("filename=\"") + 10);
+		fileName.erase(fileName.size() - 2);
 
+		// Check if sending actual file and skipping to next boundary if not
+		if (fileName == "")
+		{
+			while (std::getline(ss, line) && line != boundary)
+			{
+				;
+			}
+			continue ;
+		}
+
+		// Opening file based on fileName
+		std::cout << YELLOW "Opening file: " FUSCHIA << fileName << CLEAR << std::endl;
 		outfile.open("Uploads/" + fileName, std::ios::binary);
 		if (!outfile.is_open())
 		{
@@ -48,17 +67,27 @@ void	downloadFiles(s_request& request, std::string boundary)
 		}
 
 		// Skip until empty line
-		while (std::getline(ss, line) && line != "\r");
-
-		// Read and write file data until the boundary
-		while (std::getline(ss, line) && line != boundary)
+		while (std::getline(ss, line) && line != "\r")
 		{
-			std::cout << RED "line: " << line << ", diff: " << line.compare(boundary) << ", size: " << line.size() << CLEAR << std::endl;
+			;
+		}
+
+		// Read and write file data until reaching the boundary
+		while (std::getline(ss, line))
+		{
+			if (line == boundary || line == boundary + "--")
+			{
+				std::cout << CYAN "Found boundary" CLEAR << std::endl;
+				break;
+			}
 			outfile << line << std::endl;
 		}
 
+		// Closing file stream
+		std::cout << YELLOW "Closing file: " FUSCHIA << fileName << CLEAR << std::endl; 
 		outfile.close();
 	}
+	std::cout << GREEN "Finished downloading files!" CLEAR << std::endl;
 }
 
 void	handleData(s_request& request)
@@ -68,9 +97,7 @@ void	handleData(s_request& request)
 		throw (tempError());
 	}
 
-	std::string	boundary = request.header["Content-Type"].substr(request.header["Content-Type"].find("boundary=") + 9);
-	// boundary = "--" + boundary;
-	std::cout << GREEN "Boundary: " FUSCHIA << boundary << ", size: " << boundary.size() << CLEAR << std::endl;
+	std::string	boundary = "--" + request.header["Content-Type"].substr(request.header["Content-Type"].find("boundary=") + 9) + "\r";
 	
 	downloadFiles(request, boundary);
 	servePage(request.fd, 200, "OK", "Sources/Pages/Index.html");
